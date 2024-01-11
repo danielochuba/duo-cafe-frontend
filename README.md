@@ -91,7 +91,7 @@
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## LINK TO BACK-END <a name="back-end"></a>
-Link: [Front end](https://github.com/danielochuba/duo-cafe-backend)
+Link: [Back end](https://github.com/danielochuba/duo-cafe-backend)
 
 ## 🚀 Live Demo <a name="live-demo"></a>
 
@@ -117,7 +117,7 @@ Clone this repository to your desired folder:
 
 ```sh
   cd my-folder
-  git clone "https://github.com/danielochuba/duo-cafe-backend.git"
+  git clone "https://github.com/danielochuba/duo-cafe-frontend.git"
 ```
 ### Install
 
