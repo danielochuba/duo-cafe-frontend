@@ -121,25 +121,30 @@ Clone this repository to your desired folder:
 ```
 ### Install
 
-Go to your /house_booking_backend folder:
-
-```sh
-  cd /duo-cafe-backend
-  bundle install
-  rails s
-```
-- SETUP [Front-end](https://github.com/danielochuba/duo-cafe-frontend) 
+Go to your /duo-cafe-frontend folder:
 
 ```sh
   cd /duo-cafe-frontend
   npm install
   npm start
+```
+- SETUP [Back-end](https://github.com/danielochuba/duo-cafe-backend) 
+Clone this repository to your desired folder:
+
+```sh
+  cd my-folder
+  git clone "https://github.com/danielochuba/duo-cafe-backend.git"
+```
+
+```sh
+  cd /duo-cafe-backend
+  bundle install
 ```	
 
 ### Usage
 
 ```sh
-  npm start
+   rails s
 ```
 
 ### Deployment
