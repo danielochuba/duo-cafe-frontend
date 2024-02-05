@@ -1,0 +1,10 @@
+@import '../stylesheets/login.module.css';
+
+.signup_container {
+    background-image: url('../images/signup-home.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    padding: 20px;
+}
