@@ -16,6 +16,9 @@ const SignUp = () => {
         password: ''
     })
 
+    const [admin, setAdmin] = useState(false);
+    const [adminPasscode, setAdminPasscode] = useState(0);
+
     const validatePasswordMatch = (password, confirmPassword) => {
         if (password === confirmPassword) {
             setUser({...user, password: password});
@@ -39,8 +42,28 @@ const SignUp = () => {
         e.preventDefault();
         console.log(user)
         await dispatch(registerUser(user))
-
     }
+
+    const handleAdminRegistration = (role) => {
+        const adminInfo = document.getElementById('admin-code-error');
+        if (role === 'admin') {
+        const ADMINCODE = 50326;
+        setAdmin(true);
+
+        if (adminPasscode !== ADMINCODE || adminPasscode === 0) {
+            adminInfo.innerText = 'Invalid Admin code';
+        } else {
+            adminInfo.innerText = 'yeah ✔';
+        }
+           
+    } else if (role === '') {
+        setAdmin(false);
+        adminInfo.innerText = 'Select a role';
+    } else {
+        setUser({...user, role: e.target.value})
+        adminInfo.innerText = ' ✔';
+    }
+}
 
   return (
     <div className={`${style.signup_container}`}>
@@ -87,7 +110,7 @@ const SignUp = () => {
               className='border rounded-md p-2 w-full' 
               id='role' 
               name="role"
-              onChange={(e) => setUser({...user, role: e.target.value})}
+              onChange={(e) => handleAdminRegistration(e.target.value)}
             >
                 <option value="">Select Role</option>
                 <option value="admin">Admin</option>
@@ -95,21 +118,35 @@ const SignUp = () => {
             </select>
         </label>
 
-        <label for='password'>
+        { admin && (<label for='admin_verification'>
             <input 
               className='border rounded-md p-2 w-full' 
-              type="password" 
-              name="password" 
-              onChange={(e) => setUser({...user, password: e.target.value})}
-              placeholder='Password' 
+              type="number"
+              id='admin_verification'
+              name="admin_verification" 
+              onChange={(e) => setAdminPasscode(e.target.value)}
+              placeholder='Enter Admin authentication code...' 
             />
-        </label>
+            <small className='text-white' id='admin-code-error'></small>
+        </label>)}
 
         <label for='password'>
             <input 
               className='border rounded-md p-2 w-full' 
               type="password" 
-              name="password" 
+              name="password"
+              id='password' 
+              onChange={(e) => setUser({...user, password: e.target.value})}
+              placeholder='Password' 
+            />
+        </label>
+
+        <label for='password_confirmation'>
+            <input 
+              className='border rounded-md p-2 w-full' 
+              type="password" 
+              name="password_confirmation" 
+              id='password_confirmation'
               onChange={(e) => validatePasswordMatch(user.password, e.target.value)}
               placeholder='Confirm Password' 
             />
