@@ -4,6 +4,13 @@ import style from '../../assets/stylesheets/signup.module.css';
 import { useDispatch } from 'react-redux';
 import { registerUser } from '../../redux/actions/authSlice';
 
+// ERROR MESSAGES //
+const hasUpperCase = (str) => /[A-Z]/.test(str);
+const NAME_REQUIRED = 'Please enter your name';
+const EMAIL_REQUIRED = 'Please enter your email';
+const EMAIL_INVALID = 'Please enter a correct email address format';
+const EMAIL_INVALID_UPPERCASE = 'Please enter email address in lower case';
+
 const SignUp = () => {
 
     const dispatch = useDispatch();
@@ -15,6 +22,27 @@ const SignUp = () => {
         role: '',
         password: ''
     })
+
+    // FUNCTIONS TO HANDLE INITIAL VALIDATON //
+    const showMessage = (input, message, type) => {
+        const msg = input.nextElementSibling;
+        msg.innerText = message;
+    
+        input.className = type ? 'success' : 'error';
+        return type;
+    }
+    const showError = (input, message) => {
+        return showMessage(input, message, false);
+    }
+    const showSuccess = (input) => {
+        return showMessage(input, '', true);
+    }
+    const hasValue = (input, message) => {
+        if (input.value.trim() === '') {
+        return showError(input, message);
+        }
+        return showSuccess(input);
+    }
 
     const [admin, setAdmin] = useState(false);
     const [adminPasscode, setAdminPasscode] = useState(0);
@@ -29,40 +57,56 @@ const SignUp = () => {
     }
 
     const validateEmail = (email) => {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (re.test(email)) {
+        const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const span =  document.getElementById('email-error');
+        const isEmailValid = emailRegex.test(email);
+        if (isEmailValid) {
             setUser({...user, email: email})
-        } else {
-            document.getElementById('email-error').innerText = 'Invalid email';
-        }
+            span.innerText = '';
+        } else if (email === '') {
+            span.innerText = '';
+        } else if (!isEmailValid) {
+            span.innerText = 'Invalid email';
+        } 
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(user)
-        await dispatch(registerUser(user))
+
+        console.log(e.target.elements['email-input'].value);
+
+        Object.entries(user).forEach(([key, value]) => {
+            if (value === '') {
+
+            }
+        });
+
+       // await dispatch(registerUser(user))
     }
 
-    const handleAdminRegistration = (role) => {
+    const handleRoleRegistration = (role) => {
         const adminInfo = document.getElementById('admin-code-error');
+        const roleInfo = document.getElementById('role-error');
         if (role === 'admin') {
-        const ADMINCODE = 50326;
-        setAdmin(true);
+            roleInfo.innerText = '';
+            const ADMINCODE = 50326;
+            setAdmin(true);
 
-        if (adminPasscode !== ADMINCODE || adminPasscode === 0) {
-            adminInfo.innerText = 'Invalid Admin code';
+            if (adminPasscode !== ADMINCODE || adminPasscode === 0) {
+                adminInfo.innerText = 'Invalid Admin code';
+            } else {
+                setUser({...user, role: role})
+                adminInfo.innerText = 'yeah ✔';
+            }
+            
+        } else if (role === 'user') {
+            setAdmin(false);
+            setUser({...user, role: role});
+            roleInfo.innerText = '';
         } else {
-            adminInfo.innerText = 'yeah ✔';
+            setAdmin(false);
+            roleInfo.innerText = 'Select a role';
         }
-           
-    } else if (role === '') {
-        setAdmin(false);
-        adminInfo.innerText = 'Select a role';
-    } else {
-        setUser({...user, role: e.target.value})
-        adminInfo.innerText = ' ✔';
-    }
 }
 
   return (
@@ -76,7 +120,7 @@ const SignUp = () => {
             className='border rounded-md p-2 w-full' 
             id='first_name' 
             type="text" 
-            name="name"
+            name="first_name"
             onChange={(e) => setUser({...user, first_name: e.target.value})}
             placeholder='First Name..'
           />
@@ -87,7 +131,7 @@ const SignUp = () => {
             className='border rounded-md p-2 w-full' 
             id='last_name' 
             type="text" 
-            name="name" 
+            name="last_name" 
             onChange={(e) => setUser({...user, last_name: e.target.value})}
             placeholder='Last Name..'
           />
@@ -98,24 +142,25 @@ const SignUp = () => {
               className='border rounded-md p-2 w-full'
               id='email' 
               type="text" 
-              name="name" 
+              name="email_input" 
               onChange={(e) => validateEmail(e.target.value)}
               placeholder='Email..'
             />
-            <small className='text-red' id='email-error'></small>
+            <small className='text-white' id='email-error'></small>
         </label>
         
         <label for='role'>
             <select 
               className='border rounded-md p-2 w-full' 
               id='role' 
-              name="role"
-              onChange={(e) => handleAdminRegistration(e.target.value)}
+              name="role_input"
+              onChange={(e) => handleRoleRegistration(e.target.value)}
             >
                 <option value="">Select Role</option>
                 <option value="admin">Admin</option>
                 <option value="user">Customer</option>
             </select>
+            <small className='text-white' id='role-error'></small>
         </label>
 
         { admin && (<label for='admin_verification'>
@@ -134,7 +179,7 @@ const SignUp = () => {
             <input 
               className='border rounded-md p-2 w-full' 
               type="password" 
-              name="password"
+              name="password_input"
               id='password' 
               onChange={(e) => setUser({...user, password: e.target.value})}
               placeholder='Password' 
