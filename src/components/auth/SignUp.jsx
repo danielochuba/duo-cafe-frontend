@@ -6,8 +6,8 @@ import { registerUser } from '../../redux/actions/authSlice';
 
 // ERROR MESSAGES //
 const hasUpperCase = (str) => /[A-Z]/.test(str);
-const NAME_REQUIRED = 'Please enter your name';
-const EMAIL_REQUIRED = 'Please enter your email';
+const first_name_required = 'Please enter your name';
+const email_required = 'Please enter your email';
 const EMAIL_INVALID = 'Please enter a correct email address format';
 const EMAIL_INVALID_UPPERCASE = 'Please enter email address in lower case';
 
@@ -70,34 +70,37 @@ const SignUp = () => {
         } 
     }
 
+    const handleEmail = (e) => {
+        validateEmail(e.target.value);
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(e.target.elements['email-input'].value);
+        // console.log(e.target.elements['email-input'].value);
 
         Object.entries(user).forEach(([key, value]) => {
             if (value === '') {
+                const message = document.querySelector(`#${key}-error`);
+                message.innerText = `Please Enter ${key }`;
+                return
+            } else {
 
             }
+            console.log(key, value);
         });
 
        // await dispatch(registerUser(user))
     }
 
     const handleRoleRegistration = (role) => {
-        const adminInfo = document.getElementById('admin-code-error');
         const roleInfo = document.getElementById('role-error');
         if (role === 'admin') {
             roleInfo.innerText = '';
-            const ADMINCODE = 50326;
+            
             setAdmin(true);
 
-            if (adminPasscode !== ADMINCODE || adminPasscode === 0) {
-                adminInfo.innerText = 'Invalid Admin code';
-            } else {
-                setUser({...user, role: role})
-                adminInfo.innerText = 'yeah ✔';
-            }
+           
             
         } else if (role === 'user') {
             setAdmin(false);
@@ -108,6 +111,19 @@ const SignUp = () => {
             roleInfo.innerText = 'Select a role';
         }
 }
+
+    const handleAdminCodeVerification = (e) => {
+        setAdminPasscode(e.target.value)
+        const adminInfo = document.getElementById('admin-code-error');
+        const ADMINCODE = 50326;
+        if (adminPasscode !== ADMINCODE || adminPasscode === 0) {
+            adminInfo.innerText = 'Invalid Admin code';
+        } else {
+            setUser({...user, role: role})
+            adminInfo.innerText = 'yeah ✔';
+   
+        }
+    }
 
   return (
     <div className={`${style.signup_container}`}>
@@ -124,6 +140,7 @@ const SignUp = () => {
             onChange={(e) => setUser({...user, first_name: e.target.value})}
             placeholder='First Name..'
           />
+          <small className='text-white' id='first_name-error'></small>
         </label>
 
         <label for='last_name'>
@@ -135,15 +152,19 @@ const SignUp = () => {
             onChange={(e) => setUser({...user, last_name: e.target.value})}
             placeholder='Last Name..'
           />
+          <small className='text-white' id='last_name-error'></small>
         </label>
 
         <label for='email'>
             <input
               className='border rounded-md p-2 w-full'
               id='email' 
-              type="text" 
+              type="email" 
               name="email_input" 
-              onChange={(e) => validateEmail(e.target.value)}
+              onChange={(e) => {
+               setUser({...user, email: e.target.value})
+               handleEmail(e)
+            }}
               placeholder='Email..'
             />
             <small className='text-white' id='email-error'></small>
@@ -169,7 +190,7 @@ const SignUp = () => {
               type="number"
               id='admin_verification'
               name="admin_verification" 
-              onChange={(e) => setAdminPasscode(e.target.value)}
+              onChange={(e) => handleAdminCodeVerification(e)}
               placeholder='Enter Admin authentication code...' 
             />
             <small className='text-white' id='admin-code-error'></small>
