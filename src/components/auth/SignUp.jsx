@@ -23,36 +23,16 @@ const SignUp = () => {
         password: ''
     })
 
-    // FUNCTIONS TO HANDLE INITIAL VALIDATON //
-    const showMessage = (input, message, type) => {
-        const msg = input.nextElementSibling;
-        msg.innerText = message;
-    
-        input.className = type ? 'success' : 'error';
-        return type;
-    }
-    const showError = (input, message) => {
-        return showMessage(input, message, false);
-    }
-    const showSuccess = (input) => {
-        return showMessage(input, '', true);
-    }
-    const hasValue = (input, message) => {
-        if (input.value.trim() === '') {
-        return showError(input, message);
-        }
-        return showSuccess(input);
-    }
-
     const [admin, setAdmin] = useState(false);
+    const [password, setPassword] = useState('')
     const [adminPasscode, setAdminPasscode] = useState(0);
 
     const validatePasswordMatch = (password, confirmPassword) => {
-        if (password === confirmPassword) {
+        if (password === '' || password !== confirmPassword) {
+            document.getElementById('password-error').innerText = 'Passwords do not match';
+        } else if (password === confirmPassword) {
             setUser({...user, password: password});
             document.getElementById('password-error').innerText = 'Passwords Matched ✔';
-        } else {
-            document.getElementById('password-error').innerText = 'Passwords do not match';
         }
     }
 
@@ -80,12 +60,13 @@ const SignUp = () => {
         // console.log(e.target.elements['email-input'].value);
 
         Object.entries(user).forEach(([key, value]) => {
+            const message = document.querySelector(`#${key}-error`);
             if (value === '') {
                 const message = document.querySelector(`#${key}-error`);
                 message.innerText = `Please Enter ${key }`;
                 return
             } else {
-
+                message.innerText = '';
             }
             console.log(key, value);
         });
@@ -108,7 +89,7 @@ const SignUp = () => {
             roleInfo.innerText = '';
         } else {
             setAdmin(false);
-            roleInfo.innerText = 'Select a role';
+            roleInfo.innerText = 'Please Select a role';
         }
 }
 
@@ -202,7 +183,7 @@ const SignUp = () => {
               type="password" 
               name="password_input"
               id='password' 
-              onChange={(e) => setUser({...user, password: e.target.value})}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder='Password' 
             />
         </label>
@@ -213,7 +194,7 @@ const SignUp = () => {
               type="password" 
               name="password_confirmation" 
               id='password_confirmation'
-              onChange={(e) => validatePasswordMatch(user.password, e.target.value)}
+              onChange={(e) => validatePasswordMatch(password, e.target.value)}
               placeholder='Confirm Password' 
             />
             <small className='text-red' id='password-error'></small>
