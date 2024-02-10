@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
+import { FidgetSpinner } from 'react-loader-spinner';
 
 import style from '../../assets/stylesheets/signup.module.css';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../redux/actions/authSlice';
-
-// ERROR MESSAGES //
-const hasUpperCase = (str) => /[A-Z]/.test(str);
-const first_name_required = 'Please enter your name';
-const email_required = 'Please enter your email';
-const EMAIL_INVALID = 'Please enter a correct email address format';
-const EMAIL_INVALID_UPPERCASE = 'Please enter email address in lower case';
+import { toast } from 'react-toastify';
+import { logDOM } from '@testing-library/react';
 
 const SignUp = () => {
 
+    const loading = useSelector((state) => state.auth.loading);
+    const userInfo = useSelector((state) => state.auth.user);
+    console.log(userInfo.status.errors[0]);
+    
     const dispatch = useDispatch();
-
+    const formRef = useRef(null);
     const [user, setUser] = useState({
         first_name: '',
         last_name: '',
@@ -25,14 +25,30 @@ const SignUp = () => {
 
     const [admin, setAdmin] = useState(false);
     const [password, setPassword] = useState('')
-    const [adminPasscode, setAdminPasscode] = useState(0);
+    const [adminPasscode, setAdminPasscode] = useState('');
+    const [isAdminCode, setIsAdminCode] = useState(false);
+    const [isPasswordMatched, setIsPasswordMatched] = useState(false);
 
     const validatePasswordMatch = (password, confirmPassword) => {
-        if (password === '' || password !== confirmPassword) {
-            document.getElementById('password-error').innerText = 'Passwords do not match';
+        const passwordInfo = document.getElementById('password-error');
+
+        if (confirmPassword === '') {
+            passwordInfo.innerText = '';
+            setUser(
+                {...user, password: ''}
+            )
         } else if (password === confirmPassword) {
+            setIsPasswordMatched(true);
             setUser({...user, password: password});
-            document.getElementById('password-error').innerText = 'Passwords Matched ✔';
+            passwordInfo.innerText = 'Passwords Matched ✔';
+        } else if (password  === '' || password !== confirmPassword) {
+            setIsPasswordMatched(false);
+            passwordInfo.innerText = 'Passwords do not match..';
+            setUser(
+                {...user, password: ''}
+            )
+        } else {
+
         }
     }
 
@@ -59,26 +75,32 @@ const SignUp = () => {
 
         // console.log(e.target.elements['email-input'].value);
 
-        Object.entries(user).forEach(([key, value]) => {
+        const allInputHasValue = Object.entries(user).every(([key, value]) => {
             const message = document.querySelector(`#${key}-error`);
             if (value === '') {
-                const message = document.querySelector(`#${key}-error`);
                 message.innerText = `Please Enter ${key }`;
-                return
-            } else {
-                message.innerText = '';
+                return false
             }
-            console.log(key, value);
+            message.innerText = '';
+            return true;
         });
 
-       // await dispatch(registerUser(user))
+        console.log(allInputHasValue)
+
+        if (allInputHasValue) {
+            console.log('all ture');
+            dispatch(registerUser(user))
+            toast.success(`${userInfo.status.errors[0]}`);
+
+        }
+
     }
 
     const handleRoleRegistration = (role) => {
         const roleInfo = document.getElementById('role-error');
         if (role === 'admin') {
             roleInfo.innerText = '';
-            
+            setUser({...user, role: ''})
             setAdmin(true);
 
            
@@ -93,24 +115,40 @@ const SignUp = () => {
         }
 }
 
-    const handleAdminCodeVerification = (e) => {
-        setAdminPasscode(e.target.value)
-        const adminInfo = document.getElementById('admin-code-error');
-        const ADMINCODE = 50326;
-        if (adminPasscode !== ADMINCODE || adminPasscode === 0) {
-            adminInfo.innerText = 'Invalid Admin code';
-        } else {
-            setUser({...user, role: role})
-            adminInfo.innerText = 'yeah ✔';
-   
-        }
+    const handleAdminCodeVerification = (code) => {
+        
+        setAdminPasscode(prevPasscode => {
+            const newPasscode = Number(code);
+            const ADMINCODE = 50326;
+    
+            if (newPasscode === ADMINCODE) {
+                setUser({...user, role: role});
+                setIsAdminCode(true)
+                document.getElementById('admin-code-error').innerText = 'yeah ✔';
+            } else {
+                setUser({...user, role: ''});
+                setIsAdminCode(false)
+                document.getElementById('admin-code-error').innerText = 'Invalid Admin code';
+            }
+    
+            return newPasscode;
+        });
     }
 
   return (
+    <>
+    
+    {loading && (
+        <div className='flex flex-col absolute w-full h-full bg-white justify-center items-center'>
+            <FidgetSpinner />
+            <h4 className='font-bold'>Signing up</h4>
+        </div>
+    )}
     <div className={`${style.signup_container}`}>
       
        
-    <form className="flex flex-col sm:w-1/2 md:w-1/3 space-y-10" onSubmit={(e) => handleSubmit(e)}>
+    <form className={`${style.form} flex opacity-100 flex-col sm:w-full md:w-full space-y-10`} ref={formRef} onSubmit={(e) => handleSubmit(e)}>
+        
     <h1 className={`${style.form_title} text-center text-3xl font-bold `}>Sign Up</h1>
         <label for='first_name'>
           <input 
@@ -121,7 +159,7 @@ const SignUp = () => {
             onChange={(e) => setUser({...user, first_name: e.target.value})}
             placeholder='First Name..'
           />
-          <small className='text-white' id='first_name-error'></small>
+          <small className='text-rose-500' id='first_name-error'></small>
         </label>
 
         <label for='last_name'>
@@ -133,7 +171,7 @@ const SignUp = () => {
             onChange={(e) => setUser({...user, last_name: e.target.value})}
             placeholder='Last Name..'
           />
-          <small className='text-white' id='last_name-error'></small>
+          <small className='text-rose-500' id='last_name-error'></small>
         </label>
 
         <label for='email'>
@@ -146,9 +184,9 @@ const SignUp = () => {
                setUser({...user, email: e.target.value})
                handleEmail(e)
             }}
-              placeholder='Email..'
+            placeholder='Email..'
             />
-            <small className='text-white' id='email-error'></small>
+            <small className='text-rose-500' id='email-error'></small>
         </label>
         
         <label for='role'>
@@ -162,19 +200,19 @@ const SignUp = () => {
                 <option value="admin">Admin</option>
                 <option value="user">Customer</option>
             </select>
-            <small className='text-white' id='role-error'></small>
+            <small className='text-rose-500' id='role-error'></small>
         </label>
 
         { admin && (<label for='admin_verification'>
             <input 
               className='border rounded-md p-2 w-full' 
-              type="number"
+              type="text"
               id='admin_verification'
               name="admin_verification" 
-              onChange={(e) => handleAdminCodeVerification(e)}
+              onChange={(e) => handleAdminCodeVerification(e.target.value)}
               placeholder='Enter Admin authentication code...' 
             />
-            <small className='text-white' id='admin-code-error'></small>
+            <small className={isAdminCode ? 'text-emerald-400' : 'text-rose-500'} id='admin-code-error'></small>
         </label>)}
 
         <label for='password'>
@@ -197,7 +235,7 @@ const SignUp = () => {
               onChange={(e) => validatePasswordMatch(password, e.target.value)}
               placeholder='Confirm Password' 
             />
-            <small className='text-red' id='password-error'></small>
+            <small className={isPasswordMatched ? 'text-emerald-400' : 'text-rose-500'} id='password-error'></small>
         </label>
 
         <input 
@@ -210,6 +248,7 @@ const SignUp = () => {
     <p className="text-center absolute">Already have an account? <a href="/login">Login</a></p>
     
     </div>
+            </>
   )
 }
 
