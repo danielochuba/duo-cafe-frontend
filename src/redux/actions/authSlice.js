@@ -32,7 +32,7 @@ export const registerUser = createAsyncThunk(
                 body: JSON.stringify(userObject)
             })
             console.log(response.headers.get('Authorization'))
-            const data = await response.json()
+            const data = await response.json();
             return data
                     
     }
@@ -41,7 +41,8 @@ export const registerUser = createAsyncThunk(
 const initialState = {
     user: null,
     status: 'idle',
-    error: null
+    error: null,
+    loading: false
 }
 
 export const authSlice = createSlice({
@@ -52,26 +53,31 @@ export const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(loginUser.pending, (state) => {
+                state.loading = true
                 state.status = 'loading'
             })
             .addCase(loginUser.fulfilled, (state, action) => {
+                state.loading = false
                 state.status = 'succeeded'
                 state.user = action.payload
             })
             .addCase(loginUser.rejected, (state, action) => {
+                state.loading = false
                 state.status = 'failed'
                 state.error = action.error.message
             })
             .addCase(registerUser.pending, (state) => {
+                state.loading = true
                 state.status = 'loading'
-                console.log('loading');
             })
             .addCase(registerUser.fulfilled, (state, action) => {
-                console
+                state.loading = false
+                state.status = 'succeeded'
                 state.user = action.payload
-                console.log(action.payload);
+                console.log(state)
             })
             .addCase(registerUser.rejected, (state, action) => {
+                state.loading = false
                 state.status = 'failed'
                 state.error = action.error.message
             })
