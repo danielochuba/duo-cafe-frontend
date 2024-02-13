@@ -15,7 +15,6 @@ function Login() {
               <input className='border rounded-md p-2 w-full' type="password" name="password" placeholder='Password' />
             </label>
             
-           
             <input className='border w-1/3 rounded-lg p-2 m-auto hover:bg-slate-800 hover:text-white font-bold text-lg' type="submit" value="Submit" />
             
         </form>
