@@ -4,14 +4,14 @@ import { FidgetSpinner } from 'react-loader-spinner';
 import style from '../../assets/stylesheets/signup.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../redux/actions/authSlice';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { logDOM } from '@testing-library/react';
 
 const SignUp = () => {
 
     const loading = useSelector((state) => state.auth.loading);
     const userInfo = useSelector((state) => state.auth.user);
-    console.log(userInfo.status.errors[0]);
     
     const dispatch = useDispatch();
     const formRef = useRef(null);
@@ -72,8 +72,7 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // console.log(e.target.elements['email-input'].value);
+        console.log(user);
 
         const allInputHasValue = Object.entries(user).every(([key, value]) => {
             const message = document.querySelector(`#${key}-error`);
@@ -85,12 +84,13 @@ const SignUp = () => {
             return true;
         });
 
-        console.log(allInputHasValue)
-
         if (allInputHasValue) {
-            console.log('all ture');
             dispatch(registerUser(user))
-            toast.success(`${userInfo.status.errors[0]}`);
+
+            if(userInfo.status) {
+                 console.log(userInfo.status.errors[0]);
+                 toast.error(`${userInfo.status.errors[0]}`);
+            }
 
         }
 
@@ -102,9 +102,6 @@ const SignUp = () => {
             roleInfo.innerText = '';
             setUser({...user, role: ''})
             setAdmin(true);
-
-           
-            
         } else if (role === 'user') {
             setAdmin(false);
             setUser({...user, role: role});
@@ -122,7 +119,7 @@ const SignUp = () => {
             const ADMINCODE = 50326;
     
             if (newPasscode === ADMINCODE) {
-                setUser({...user, role: role});
+                setUser({...user, role: 'admin'});
                 setIsAdminCode(true)
                 document.getElementById('admin-code-error').innerText = 'yeah ✔';
             } else {
@@ -130,7 +127,6 @@ const SignUp = () => {
                 setIsAdminCode(false)
                 document.getElementById('admin-code-error').innerText = 'Invalid Admin code';
             }
-    
             return newPasscode;
         });
     }
@@ -146,7 +142,7 @@ const SignUp = () => {
     )}
     <div className={`${style.signup_container}`}>
       
-       
+    <ToastContainer />
     <form className={`${style.form} flex opacity-100 flex-col sm:w-full md:w-full space-y-10`} ref={formRef} onSubmit={(e) => handleSubmit(e)}>
         
     <h1 className={`${style.form_title} text-center text-3xl font-bold `}>Sign Up</h1>
