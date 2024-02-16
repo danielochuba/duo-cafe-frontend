@@ -1,0 +1,15 @@
+@import '../stylesheets/login.module.css';
+
+.signup_container {
+  background-image: url('../images/signup-home.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
+.form {
+  background-color: rgba(144, 141, 141, 0.3);
+  width: 100%;
+  padding: 20px;
+}
