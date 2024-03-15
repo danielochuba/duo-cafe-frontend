@@ -3,6 +3,7 @@ import { FidgetSpinner } from 'react-loader-spinner';
 
 import style from '../../assets/stylesheets/signup.module.css';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../../redux/actions/authSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,6 +16,9 @@ const SignUp = () => {
     
     const dispatch = useDispatch();
     const formRef = useRef(null);
+
+    const navigate = useNavigate();
+
     const [user, setUser] = useState({
         first_name: '',
         last_name: '',
@@ -85,16 +89,22 @@ const SignUp = () => {
         });
 
         if (allInputHasValue) {
-            dispatch(registerUser(user))
+            try {
 
-            if(userInfo.status) {
-                 console.log(userInfo.status.errors[0]);
-                 toast.error(`${userInfo.status.errors[0]}`);
+            const response = await dispatch(registerUser(user))
+            if (!response.payload.status.errors) {
+                toast.success('Sign up successful');
+                navigate('/login');
             }
 
+
+        } catch (error) {
+            console.log('Error logging in:', response.payload.status.errors);
+            toast.error('An error occurred while logging in. Please try again later.');
         }
 
     }
+}
 
     const handleRoleRegistration = (role) => {
         const roleInfo = document.getElementById('role-error');
@@ -146,7 +156,7 @@ const SignUp = () => {
     <form className={`${style.form} flex opacity-100 flex-col sm:w-full md:w-full space-y-10`} ref={formRef} onSubmit={(e) => handleSubmit(e)}>
         
     <h1 className={`${style.form_title} text-center text-3xl font-bold `}>Sign Up</h1>
-        <label for='first_name'>
+        <label htmlFor='first_name'>
           <input 
             className='border rounded-md p-2 w-full' 
             id='first_name' 
@@ -158,7 +168,7 @@ const SignUp = () => {
           <small className='text-rose-500' id='first_name-error'></small>
         </label>
 
-        <label for='last_name'>
+        <label htmlFor='last_name'>
           <input
             className='border rounded-md p-2 w-full' 
             id='last_name' 
@@ -170,7 +180,7 @@ const SignUp = () => {
           <small className='text-rose-500' id='last_name-error'></small>
         </label>
 
-        <label for='email'>
+        <label htmlFor='email'>
             <input
               className='border rounded-md p-2 w-full'
               id='email' 
@@ -185,7 +195,7 @@ const SignUp = () => {
             <small className='text-rose-500' id='email-error'></small>
         </label>
         
-        <label for='role'>
+        <label htmlFor='role'>
             <select 
               className='border rounded-md p-2 w-full' 
               id='role' 
@@ -199,7 +209,7 @@ const SignUp = () => {
             <small className='text-rose-500' id='role-error'></small>
         </label>
 
-        { admin && (<label for='admin_verification'>
+        { admin && (<label htmlFor='admin_verification'>
             <input 
               className='border rounded-md p-2 w-full' 
               type="text"
@@ -211,7 +221,7 @@ const SignUp = () => {
             <small className={isAdminCode ? 'text-emerald-400' : 'text-rose-500'} id='admin-code-error'></small>
         </label>)}
 
-        <label for='password'>
+        <label htmlFor='password'>
             <input 
               className='border rounded-md p-2 w-full' 
               type="password" 
@@ -222,7 +232,7 @@ const SignUp = () => {
             />
         </label>
 
-        <label for='password_confirmation'>
+        <label htmlFor='password_confirmation'>
             <input 
               className='border rounded-md p-2 w-full' 
               type="password" 
