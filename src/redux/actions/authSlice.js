@@ -1,16 +1,60 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const BASE_URL = 'http://127.0.0.1:3000/users';
 
 
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
+    // async (user) => {
+    //     const response = await axios.post(`${BASE_URL}/sign_in`, user)
+    //     return response.data
+    // }
     async (user) => {
-        const response = await axios.post(`${BASE_URL}/login`, user)
-        return response.data
+        const userObject = {
+            user: {
+                email: user.email,
+                password: user.password
+            }
+        }
+            const response = await fetch(`${BASE_URL}/sign_in`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userObject)
+            })
+            console.log(response)
+            if (user.role === 'admin') {
+                Cookies.set('admin_token', response.headers.get('Authorization'), { expires: 1 })
+            } else {
+                Cookies.set('user_token', response.headers.get('Authorization'), { expires: 1 })
+            }
+            const data = await response.json();
+            
+            return data
     }
 )
+
+export const logoutUser = createAsyncThunk(
+    'auth/logoutUser',
+    async () => {
+        const response = await fetch(`${BASE_URL}/sign_out`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': Cookies.get('admin_token') || Cookies.get('user_token')
+            }
+        })
+
+        Cookies.remove('admin_token') || Cookies.remove('user_token')
+        const data = await response.json();
+        console.log(data)
+        return data
+    }
+)
+
 
 export const registerUser = createAsyncThunk(
     'auth/registerUser',
@@ -31,6 +75,14 @@ export const registerUser = createAsyncThunk(
                 },
                 body: JSON.stringify(userObject)
             })
+
+            if (user.role === 'admin') {
+                Cookies.set('admin_token', response.headers.get('Authorization'), { expires: 1 })
+            } else {
+                Cookies.set('user_token', response.headers.get('Authorization'), { expires: 1 })
+            }
+            
+            console.log(response)
             console.log(response.headers.get('Authorization'))
             const data = await response.json();
             return data
@@ -77,6 +129,20 @@ export const authSlice = createSlice({
                 console.log(state)
             })
             .addCase(registerUser.rejected, (state, action) => {
+                state.loading = false
+                state.status = 'failed'
+                state.error = action.error.message
+            })
+            .addCase(logoutUser.pending, (state) => {
+                state.loading = true
+                state.status = 'loading'
+            })
+            .addCase(logoutUser.fulfilled, (state, action) => {
+                state.loading = false
+                state.status = action.payload
+                state.user = null
+            })
+            .addCase(logoutUser.rejected, (state, action) => {
                 state.loading = false
                 state.status = 'failed'
                 state.error = action.error.message

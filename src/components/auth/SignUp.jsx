@@ -51,9 +51,7 @@ const SignUp = () => {
             setUser(
                 {...user, password: ''}
             )
-        } else {
-
-        }
+        } 
     }
 
     const validateEmail = (email) => {
@@ -76,7 +74,6 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(user);
 
         const allInputHasValue = Object.entries(user).every(([key, value]) => {
             const message = document.querySelector(`#${key}-error`);
@@ -92,9 +89,12 @@ const SignUp = () => {
             try {
 
             const response = await dispatch(registerUser(user))
+            console.log(response.payload.status.errors);
             if (!response.payload.status.errors) {
                 toast.success('Sign up successful');
-                navigate('/login');
+                navigate('/');
+            } else {
+                toast.error(response.payload.status.errors[0])
             }
 
 
@@ -102,7 +102,6 @@ const SignUp = () => {
             console.log('Error logging in:', response.payload.status.errors);
             toast.error('An error occurred while logging in. Please try again later.');
         }
-
     }
 }
 
