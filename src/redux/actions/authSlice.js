@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const BASE_URL = 'http://127.0.0.1:3000/users';
