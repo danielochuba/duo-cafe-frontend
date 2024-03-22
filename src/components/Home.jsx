@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from '../redux/actions/authSlice';
 import { useDispatch } from 'react-redux';
+import Navbar from './Navbar';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ const Home = () => {
 
   return (
     <div>
+      <Navbar />
       home
       <button onClick={handleLogout}>
         Log Out
