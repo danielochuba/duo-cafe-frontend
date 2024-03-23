@@ -5,7 +5,7 @@ const Offer = () => {
 
 
   return (
-    <div className="w-[9rem] h-[9rem] rounded-tl-50 rounded-tr-10 rounded-br-50 rounded-bl-10"
+    <div className="w-[9rem] h-[9rem] rounded-tl-[50px] rounded-tr-[10px] rounded-br-[50px] rounded-bl-[10px]"
     style={{
         backgroundImage: `url(${HeroImage})`,
         // opacity: 0.7

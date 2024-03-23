@@ -41,6 +41,7 @@ const Home = () => {
 
           <section className="text-gray-600 body-font p-5">
             <h3 className="text-2xl font-bold text-center font-serif">Offers</h3>
+            
             <Offer />
           </section>
 
