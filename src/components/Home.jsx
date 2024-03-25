@@ -7,10 +7,19 @@ import { useDispatch } from 'react-redux';
 import Navbar from './Navbar';
 import HeroImage from '../assets/images/hero.png';
 import Offer from './Offer';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
+import Coffee from './Coffee';
 
 const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   // Empty dependency array ensures the effect runs only once after the component mounts
 
   const handleLogout = (e) => {
@@ -39,11 +48,43 @@ const Home = () => {
         <p className="text-center">a place where the rich aroma of freshly brewed coffee mingles with the soothing ambiance of comfort.</p>
       </section>
 
-          <section className="text-gray-600 body-font p-5">
-            <h3 className="text-2xl font-bold text-center font-serif">Offers</h3>
-            
+      <h3 className="text-2xl font-bold text-center font-serif">Offers</h3>
+      <section className=" text-gray-600 body-font p-5">
+        <Swiper
+           modules={[Navigation, Pagination, Scrollbar, A11y]}
+           spaceBetween={50}
+           slidesPerView={3}
+           navigation
+           pagination={{ clickable: true }}
+           scrollbar={{ draggable: true }}
+           onSwiper={(swiper) => console.log(swiper)}
+        >
+
+          <SwiperSlide>
             <Offer />
-          </section>
+          </SwiperSlide>
+
+          <SwiperSlide>
+            <Offer />
+          </SwiperSlide>
+
+          <SwiperSlide>
+            <Offer />
+          </SwiperSlide>
+
+          <SwiperSlide>
+            <Offer />
+          </SwiperSlide>
+
+          <SwiperSlide>
+            <Offer />
+          </SwiperSlide>
+
+        </Swiper>
+      </section>
+      <section className="text-gray-600 body-font">
+        <Coffee />
+      </section>
 
       <div>
 
