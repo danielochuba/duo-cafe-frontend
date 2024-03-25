@@ -18,4 +18,4 @@ function Coffee() {
   )
 }
 
-export default Coffee
+export default Coffee;
