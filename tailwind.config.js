@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {},
+    fontFamily: {
+      serif: ['"Inria Serif"', 'serif'],
+    },
   },
   plugins: [],
 }

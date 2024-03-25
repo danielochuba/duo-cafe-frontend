@@ -1,0 +1,11 @@
+nav {
+  font-variant: normal;
+}
+
+.nav_logo {
+  font-family: "Diplomata", serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #cd853f;
+  height: 44px;
+}
